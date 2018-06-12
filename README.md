@@ -9,6 +9,7 @@ It only works with numeric versions. Latest tag is dismissed.
 
 ## Requires
 jquery-3.3.1: https://code.jquery.com/jquery-3.3.1.min.js
+
 docker registry to be installed in docker-registry.local
 
 
