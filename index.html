@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>GDAP Docker current version</title>
+    <style>
+    P{ font-family:'Segoe UI',Arial,sans-serif }
+    </style>
+</head>
+<body>
+    <script src="jquery-3.3.1.min.js"></script>
+    <script>
+    var url = "https://docker_registry.local/v2/"
+    var dockers_displayed = 0;
+    $.getJSON(url+"_catalog", function (catalog) {
+        var total_dockers = catalog.repositories.length;
+        $.each(catalog.repositories.sort(), function (_, name ) {
+            $.getJSON(url+name+"/tags/list", function (image) {
+                var latest = $.inArray("latest", image.tags)
+                if( latest>=0 )
+                    image.tags.splice($.inArray("latest", image.tags),1);
+                image.tags = image.tags.sort( (a, b) => a.localeCompare(b, undefined, { numeric:true }) );
+                var current = current=image.tags[image.tags.length-1]
+                $('#dockers').append('<p class="docker">'+image.name+': '+current+'</p>')
+                dockers_displayed++;
+
+                if( dockers_displayed == total_dockers ) process_qs();
+            });
+        });
+        process_qs();
+    });
+
+    $(function(){
+    $('#searchquery').keyup(function(){
+
+        var valThis = $(this).val().toLowerCase();
+        if(valThis == ""){
+            $('p.docker').show();
+        } else {
+            $('p.docker').each(function(){
+
+                var text = $(this).text().toLowerCase();
+                (text.indexOf(valThis) != -1) ? $(this).show() : $(this).hide();
+            });
+        };
+    });
+    });
+
+    function process_qs(){
+    var qs = /\?(.*)/.exec(window.location.href);
+    if( qs && qs.length > 1){
+        $("#searchquery").val(qs[1]);
+        $('#searchquery').keyup();
+    };
+    };
+
+    </script>
+    <div class="searchcontainer">
+        <input type="text" id="searchquery">
+    </div>
+    <div id="dockers">
+    </div>
+</body>
+</html>
